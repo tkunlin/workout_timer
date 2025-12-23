@@ -2,294 +2,21 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <title>肌力訓練倒數計時器</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-
-      :root {
-        --bg: #0f172a;
-        --card-bg: #020617;
-        --text-main: #e5e7eb;
-        --text-sub: #9ca3af;
-        --text-muted: #6b7280;
-        --border-color: rgba(148, 163, 184, 0.3);
-        --input-bg: #020617;
-        --input-border: #4b5563;
-        --button-primary-bg: #22c55e;
-        --button-primary-text: #022c22;
-        --button-secondary-bg: #111827;
-        --button-secondary-border: #374151;
-        --progress-bg: #1f2937;
-        --shadow-main: 0 18px 45px rgba(0, 0, 0, 0.55);
-      }
-
-      :root[data-theme="light"] {
-        --bg: #f3f4f6;
-        --card-bg: #ffffff;
-        --text-main: #111827;
-        --text-sub: #4b5563;
-        --text-muted: #6b7280;
-        --border-color: rgba(148, 163, 184, 0.7);
-        --input-bg: #ffffff;
-        --input-border: #9ca3af;
-        --button-primary-bg: #16a34a;
-        --button-primary-text: #f9fafb;
-        --button-secondary-bg: #e5e7eb;
-        --button-secondary-border: #d1d5db;
-        --progress-bg: #e5e7eb;
-        --shadow-main: 0 12px 30px rgba(15, 23, 42, 0.15);
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        margin: 0;
-        padding: 0;
-        background: var(--bg);
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
-
-      .container {
-        max-width: 420px;
-        width: 100%;
-        padding: 18px 20px 26px;
-        background: var(--card-bg);
-        border-radius: 18px;
-        box-shadow: var(--shadow-main);
-        border: 1px solid var(--border-color);
-      }
-
-      .top-bar {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-
-      .top-bar-controls {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      #lang-select {
-        padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text-main);
-        font-size: 12px;
-      }
-
-      #lang-select:focus {
-        outline: none;
-        border-color: #22c55e;
-        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
-      }
-
-      #theme-toggle {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        border: 1px solid var(--input-border);
-        background: var(--card-bg);
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-      }
-
-      #theme-toggle:hover {
-        opacity: 0.86;
-      }
-
-      h1 {
-        font-size: 20px;
-        margin: 0 0 8px;
-        text-align: center;
-      }
-
-      .subtitle {
-        font-size: 13px;
-        text-align: center;
-        color: var(--text-sub);
-        margin-bottom: 18px;
-      }
-
-      .form-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-
-      .field {
-        flex: 1;
-      }
-
-      label {
-        display: block;
-        font-size: 12px;
-        margin-bottom: 4px;
-        color: var(--text-sub);
-      }
-
-      input[type="number"] {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 10px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text-main);
-        font-size: 14px;
-      }
-
-      input[type="number"]:focus {
-        outline: none;
-        border-color: #22c55e;
-        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
-      }
-
-      .timer-wrapper {
-        margin: 18px auto 14px;
-        display: flex;
-        justify-content: center;
-      }
-
-      .progress-ring {
-        transform: rotate(-90deg);
-      }
-
-      .progress-ring__background {
-        fill: transparent;
-        stroke: var(--progress-bg);
-        stroke-width: 10;
-      }
-
-      .progress-ring__circle {
-        fill: transparent;
-        stroke: #22c55e;
-        stroke-width: 10;
-        stroke-linecap: round;
-        transition: stroke-dashoffset 0.25s linear;
-      }
-
-      .timer-center {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-      }
-
-      .timer-value {
-        font-size: 32px;
-        font-weight: 600;
-      }
-
-      .timer-phase {
-        font-size: 13px;
-        margin-top: 4px;
-        color: var(--text-sub);
-      }
-
-      .timer-set {
-        font-size: 12px;
-        margin-top: 2px;
-        color: var(--text-muted);
-      }
-
-      .timer-shell {
-        position: relative;
-        width: 220px;
-        height: 220px;
-      }
-
-      .status-bar {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        color: var(--text-sub);
-        margin-bottom: 10px;
-      }
-
-      .buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 4px;
-      }
-
-      button {
-        flex: 1;
-        border-radius: 999px;
-        border: none;
-        padding: 10px 12px;
-        font-size: 15px;
-        font-weight: 500;
-        cursor: pointer;
-      }
-
-      #start-btn {
-        background: var(--button-primary-bg);
-        color: var(--button-primary-text);
-      }
-
-      #start-btn:disabled {
-        background: #14532d;
-        cursor: not-allowed;
-      }
-
-      #stop-btn {
-        background: var(--button-secondary-bg);
-        color: var(--text-main);
-        border: 1px solid var(--button-secondary-border);
-      }
-
-      #stop-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .hint {
-        margin-top: 10px;
-        font-size: 11px;
-        color: var(--text-muted);
-      }
-
-      .phase-work {
-        color: #22c55e;
-      }
-
-      .phase-rest {
-        color: #38bdf8;
-      }
-
-      .phase-done {
-        color: #f97316;
-      }
-
-      @media (max-width: 480px) {
-        .container {
-          border-radius: 0;
-          height: 100vh;
-          max-width: 480px;
-        }
-      }
-    </style>
+    <title>Workout Timer - 肌力訓練倒數計時器</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
   </head>
   <body>
     <div class="container">
-      <div class="top-bar">
-        <div class="top-bar-controls">
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <div class="logo-dot"></div>
+          <div class="top-title" data-i18n="title_short">Workout Timer</div>
+        </div>
+        <div class="top-bar-right">
           <select id="lang-select" aria-label="Language">
             <option value="zh">中文</option>
             <option value="en">English</option>
@@ -303,492 +30,116 @@
             🌙
           </button>
         </div>
-      </div>
+      </header>
 
-      <h1 data-i18n="title">肌力訓練倒數計時器</h1>
-      <div class="subtitle" data-i18n="subtitle">
-        設定每組運動秒數、休息秒數與組數，按「開始」就能自動跑完整個循環。
-      </div>
+      <section class="intro">
+        <h1 data-i18n="title">肌力訓練倒數計時器</h1>
+        <p class="subtitle" data-i18n="subtitle">
+          設定每組運動秒數、休息秒數與組數，按「開始」就能自動跑完整個循環。
+        </p>
+      </section>
 
-      <div class="form-row">
-        <div class="field">
-          <label for="work-seconds" data-i18n="label_work">運動秒數 (秒)</label>
-          <input id="work-seconds" type="number" min="5" max="3600" value="30" />
-        </div>
-        <div class="field">
-          <label for="rest-seconds" data-i18n="label_rest">休息秒數 (秒)</label>
-          <input id="rest-seconds" type="number" min="0" max="3600" value="15" />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="field">
-          <label for="sets-count" data-i18n="label_sets">組數</label>
-          <input id="sets-count" type="number" min="1" max="99" value="5" />
-        </div>
-      </div>
-
-      <div class="status-bar">
-        <div id="status-label">狀態：待機中</div>
-        <div id="total-label">總時間：約 3 分鐘</div>
-      </div>
-
-      <div class="timer-wrapper">
-        <div class="timer-shell">
-          <svg class="progress-ring" width="220" height="220">
-            <circle
-              class="progress-ring__background"
-              cx="110" cy="110" r="95"
-            ></circle>
-            <circle
-              id="progress-ring"
-              class="progress-ring__circle"
-              cx="110" cy="110" r="95"
-            ></circle>
-          </svg>
-          <div class="timer-center">
-            <div id="timer-value" class="timer-value">00:00</div>
-            <div id="timer-phase" class="timer-phase phase-done">待機中</div>
-            <div id="timer-set" class="timer-set">組數：0 / 0</div>
+      <main class="main-layout">
+        <!-- 左：計時圈 -->
+        <section class="main-left">
+          <div class="timer-shell">
+            <svg class="progress-ring" width="220" height="220">
+              <circle
+                class="progress-ring__background"
+                cx="110"
+                cy="110"
+                r="95"
+              ></circle>
+              <circle
+                id="progress-ring"
+                class="progress-ring__circle"
+                cx="110"
+                cy="110"
+                r="95"
+              ></circle>
+            </svg>
+            <div class="timer-center">
+              <div id="timer-value" class="timer-value">00:00</div>
+              <div id="timer-phase" class="timer-phase phase-idle">
+                待機中
+              </div>
+              <div id="timer-set" class="timer-set">組數：0 / 0</div>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div class="buttons">
-        <button id="start-btn" data-i18n="btn_start">開始</button>
-        <button id="stop-btn" disabled data-i18n="btn_stop">結束</button>
-      </div>
+        <!-- 右：設定 + 狀態 + 按鈕 + hint -->
+        <section class="main-right">
+          <div class="form-row">
+            <div class="field">
+              <label for="work-seconds" data-i18n="label_work"
+                >運動秒數 (秒)</label
+              >
+              <input
+                id="work-seconds"
+                type="number"
+                min="5"
+                max="3600"
+                value="30"
+              />
+            </div>
+            <div class="field">
+              <label for="rest-seconds" data-i18n="label_rest"
+                >休息秒數 (秒)</label
+              >
+              <input
+                id="rest-seconds"
+                type="number"
+                min="0"
+                max="3600"
+                value="15"
+              />
+            </div>
+          </div>
 
-      <div class="hint">
-        <span data-i18n="hint_line1">・時間到前 5 秒會每秒提示一聲。</span><br />
-        <span data-i18n="hint_line2">・按「結束」可隨時中止並重置計時。</span><br />
-        <span data-i18n="hint_line3">
-          ・此工具為單人訓練設計，若要多人共用可再拆成不同瀏覽器分頁。
-        </span>
-      </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="sets-count" data-i18n="label_sets">組數</label>
+              <input id="sets-count" type="number" min="1" max="99" value="5" />
+            </div>
+          </div>
+
+          <div class="status-bar">
+            <div id="status-label">狀態：待機中</div>
+            <div id="total-label">總時間：約 3 分鐘</div>
+          </div>
+
+          <div class="buttons">
+            <button id="start-btn" data-i18n="btn_start">開始</button>
+            <button id="stop-btn" disabled data-i18n="btn_stop">結束</button>
+          </div>
+
+          <div class="hint">
+            <button id="hint-toggle" type="button" class="hint-toggle">
+              <span
+                id="hint-toggle-label"
+                class="hint-toggle-label"
+                data-i18n="hint_title"
+                >使用說明 / Hint</span
+              >
+              <span id="hint-toggle-icon" class="hint-toggle-icon">▲</span>
+            </button>
+            <div id="hint-content" class="hint-content">
+              <span data-i18n="hint_line1"
+                >・時間到前 5 秒會每秒提示一聲。</span
+              ><br />
+              <span data-i18n="hint_line2"
+                >・按「結束」可隨時中止並重置計時。</span
+              ><br />
+              <span data-i18n="hint_line3">
+                ・此工具為單人訓練設計，若要多人共用可再拆成不同瀏覽器分頁。
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
 
-    <script>
-      // ----- 多語系字串定義 -----
-      const i18n = {
-        zh: {
-          title: "肌力訓練倒數計時器",
-          subtitle:
-            "設定每組運動秒數、休息秒數與組數，按「開始」就能自動跑完整個循環。",
-          label_work: "運動秒數 (秒)",
-          label_rest: "休息秒數 (秒)",
-          label_sets: "組數",
-          hint_line1: "・時間到前 5 秒會每秒提示一聲。",
-          hint_line2: "・按「結束」可隨時中止並重置計時。",
-          hint_line3:
-            "・此工具為單人訓練設計，若要多人共用可再拆成不同瀏覽器分頁。",
-          btn_start: "開始",
-          btn_stop: "結束",
-          phase_idle: "待機中",
-          phase_work: "運動",
-          phase_rest: "休息",
-          phase_done: "全部完成！辛苦了",
-          sets_info: "組數：{current} / {total}",
-          status_idle: "狀態：待機中",
-          status_work: "狀態：第 {set} 組運動中",
-          status_rest: "狀態：第 {set} 組休息中",
-          status_done: "狀態：完成",
-          total_time_zero: "總時間：約 0 秒",
-          total_time_seconds: "總時間：約 {seconds} 秒",
-          total_time_minutes: "總時間：約 {minutes} 分",
-          total_time_minutes_seconds: "總時間：約 {minutes} 分 {seconds} 秒",
-          theme_tooltip_dark: "切換為淺色主題",
-          theme_tooltip_light: "切換為深色主題",
-          lang_label: "語言",
-        },
-        en: {
-          title: "Workout Timer",
-          subtitle:
-            "Set work seconds, rest seconds and number of sets, then press “Start” to run the whole cycle.",
-          label_work: "Work seconds (sec)",
-          label_rest: "Rest seconds (sec)",
-          label_sets: "Sets",
-          hint_line1:
-            "・A short beep will play in each of the last 5 seconds.",
-          hint_line2:
-            "・Press “Stop” to cancel and reset the timer at any time.",
-          hint_line3:
-            "・Designed for single-person training; open multiple tabs for multiple users.",
-          btn_start: "Start",
-          btn_stop: "Stop",
-          phase_idle: "Idle",
-          phase_work: "Work",
-          phase_rest: "Rest",
-          phase_done: "All sets completed! Good job!",
-          sets_info: "Sets: {current} / {total}",
-          status_idle: "Status: Idle",
-          status_work: "Status: Working – Set {set}",
-          status_rest: "Status: Resting – Set {set}",
-          status_done: "Status: Done",
-          total_time_zero: "Total time: about 0 seconds",
-          total_time_seconds: "Total time: about {seconds} seconds",
-          total_time_minutes: "Total time: about {minutes} minutes",
-          total_time_minutes_seconds:
-            "Total time: about {minutes} min {seconds} sec",
-          theme_tooltip_dark: "Switch to light theme",
-          theme_tooltip_light: "Switch to dark theme",
-          lang_label: "Language",
-        },
-      };
-
-      let currentLang = localStorage.getItem("lang") || "zh";
-      let currentTheme = localStorage.getItem("theme") || "dark";
-
-      function t(key, vars) {
-        const dict = i18n[currentLang] || i18n["zh"];
-        let str = dict[key] || key;
-        if (vars) {
-          for (const [k, v] of Object.entries(vars)) {
-            str = str.replace(`{${k}}`, v);
-          }
-        }
-        return str;
-      }
-
-      const progressCircle = document.getElementById("progress-ring");
-      const RADIUS = 95;
-      const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-      progressCircle.style.strokeDasharray =
-        CIRCUMFERENCE + " " + CIRCUMFERENCE;
-      progressCircle.style.strokeDashoffset = 0;
-
-      const timerValueEl = document.getElementById("timer-value");
-      const timerPhaseEl = document.getElementById("timer-phase");
-      const timerSetEl = document.getElementById("timer-set");
-      const statusLabelEl = document.getElementById("status-label");
-      const totalLabelEl = document.getElementById("total-label");
-
-      const workInput = document.getElementById("work-seconds");
-      const restInput = document.getElementById("rest-seconds");
-      const setsInput = document.getElementById("sets-count");
-      const startBtn = document.getElementById("start-btn");
-      const stopBtn = document.getElementById("stop-btn");
-      const langSelectEl = document.getElementById("lang-select");
-      const themeToggleBtn = document.getElementById("theme-toggle");
-      const rootEl = document.documentElement;
-
-      langSelectEl.value = currentLang;
-
-      let timerId = null;
-      let phase = "idle"; // idle | work | rest | done
-      let currentSet = 0;
-      let remainingSec = 0;
-      let phaseTotalSec = 0;
-      let globalWorkSec = 0;
-      let globalRestSec = 0;
-      let globalSets = 0;
-
-      function setProgress(percent) {
-        const offset = CIRCUMFERENCE - percent * CIRCUMFERENCE;
-        progressCircle.style.strokeDashoffset = offset;
-      }
-
-      function formatTime(sec) {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        const mm = String(m).padStart(2, "0");
-        const ss = String(s).padStart(2, "0");
-        return mm + ":" + ss;
-      }
-
-      function updateTotalLabel() {
-        const w = parseInt(workInput.value, 10) || 0;
-        const r = parseInt(restInput.value, 10) || 0;
-        const n = parseInt(setsInput.value, 10) || 0;
-        let total = n * w + (n - 1) * r; // 最後一組通常不休息
-        if (total < 0 || !isFinite(total)) total = 0;
-
-        const minutes = Math.floor(total / 60);
-        const seconds = total % 60;
-
-        let text;
-        if (total === 0) {
-          text = t("total_time_zero");
-        } else if (minutes === 0) {
-          text = t("total_time_seconds", { seconds });
-        } else if (seconds === 0) {
-          text = t("total_time_minutes", { minutes });
-        } else {
-          text = t("total_time_minutes_seconds", { minutes, seconds });
-        }
-        totalLabelEl.textContent = text;
-      }
-
-      workInput.addEventListener("input", updateTotalLabel);
-      restInput.addEventListener("input", updateTotalLabel);
-      setsInput.addEventListener("input", updateTotalLabel);
-
-      function resetState() {
-        if (timerId) {
-          clearInterval(timerId);
-          timerId = null;
-        }
-        phase = "idle";
-        currentSet = 0;
-        remainingSec = 0;
-        phaseTotalSec = 0;
-        setProgress(0);
-        timerValueEl.textContent = "00:00";
-        timerPhaseEl.textContent = t("phase_idle");
-        timerPhaseEl.className = "timer-phase phase-done";
-        timerSetEl.textContent = t("sets_info", { current: 0, total: 0 });
-        statusLabelEl.textContent = t("status_idle");
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      }
-
-      // Web Audio API 嗶聲
-      function playBeep() {
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const osc = ctx.createOscillator();
-          const gainNode = ctx.createGain();
-          osc.type = "sine";
-          osc.frequency.value = 1200;
-          gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(
-            0.2,
-            ctx.currentTime + 0.01
-          );
-          gainNode.gain.exponentialRampToValueAtTime(
-            0.0001,
-            ctx.currentTime + 0.18
-          );
-          osc.connect(gainNode);
-          gainNode.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.2);
-        } catch (e) {
-          // 失敗就靜音略過
-        }
-      }
-
-      function nextPhase() {
-        if (phase === "work") {
-          if (globalRestSec > 0) {
-            // 運動 -> 休息
-            phase = "rest";
-            remainingSec = globalRestSec;
-            phaseTotalSec = globalRestSec;
-            timerPhaseEl.textContent = t("phase_rest");
-            timerPhaseEl.className = "timer-phase phase-rest";
-            statusLabelEl.textContent = t("status_rest", {
-              set: currentSet,
-            });
-            setProgress(1);
-            return;
-          } else {
-            // 不休息 -> 看是否進下一組
-            if (currentSet < globalSets) {
-              currentSet++;
-              phase = "work";
-              remainingSec = globalWorkSec;
-              phaseTotalSec = globalWorkSec;
-              timerPhaseEl.textContent = t("phase_work");
-              timerPhaseEl.className = "timer-phase phase-work";
-              statusLabelEl.textContent = t("status_work", {
-                set: currentSet,
-              });
-              timerSetEl.textContent = t("sets_info", {
-                current: currentSet,
-                total: globalSets,
-              });
-              setProgress(1);
-              return;
-            } else {
-              // 全部完成
-              phase = "done";
-              remainingSec = 0;
-              phaseTotalSec = 0;
-              timerValueEl.textContent = "完成";
-              timerPhaseEl.textContent = t("phase_done");
-              timerPhaseEl.className = "timer-phase phase-done";
-              statusLabelEl.textContent = t("status_done");
-              timerSetEl.textContent = t("sets_info", {
-                current: globalSets,
-                total: globalSets,
-              });
-              setProgress(0);
-              clearInterval(timerId);
-              timerId = null;
-              startBtn.disabled = false;
-              stopBtn.disabled = true;
-              playBeep();
-              playBeep();
-              return;
-            }
-          }
-        } else if (phase === "rest") {
-          // 休息 -> 下一組運動
-          if (currentSet < globalSets) {
-            currentSet++;
-            phase = "work";
-            remainingSec = globalWorkSec;
-            phaseTotalSec = globalWorkSec;
-            timerPhaseEl.textContent = t("phase_work");
-            timerPhaseEl.className = "timer-phase phase-work";
-            statusLabelEl.textContent = t("status_work", {
-              set: currentSet,
-            });
-            timerSetEl.textContent = t("sets_info", {
-              current: currentSet,
-              total: globalSets,
-            });
-            setProgress(1);
-            return;
-          } else {
-            // 保險分支
-            phase = "done";
-            remainingSec = 0;
-            phaseTotalSec = 0;
-            timerValueEl.textContent = "完成";
-            timerPhaseEl.textContent = t("phase_done");
-            timerPhaseEl.className = "timer-phase phase-done";
-            statusLabelEl.textContent = t("status_done");
-            timerSetEl.textContent = t("sets_info", {
-              current: globalSets,
-              total: globalSets,
-            });
-            setProgress(0);
-            clearInterval(timerId);
-            timerId = null;
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            playBeep();
-            playBeep();
-            return;
-          }
-        }
-      }
-
-      function tick() {
-        if (remainingSec <= 0) {
-          nextPhase();
-          return;
-        }
-
-        remainingSec -= 1;
-
-        timerValueEl.textContent = formatTime(remainingSec);
-        if (phaseTotalSec > 0) {
-          setProgress(remainingSec / phaseTotalSec);
-        }
-
-        if (remainingSec > 0 && remainingSec <= 5) {
-          playBeep();
-        }
-
-        if (remainingSec <= 0) {
-          nextPhase();
-        }
-      }
-
-      function applyTranslations() {
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-          const key = el.getAttribute("data-i18n");
-          el.textContent = t(key);
-        });
-
-        // 狀態與組數在 resetState / 執行中會再用 t() 更新
-        updateTotalLabel();
-
-        // 控制元件 tooltip
-        langSelectEl.title = t("lang_label");
-        themeToggleBtn.title =
-          currentTheme === "dark"
-            ? t("theme_tooltip_dark")
-            : t("theme_tooltip_light");
-      }
-
-      function applyTheme() {
-        rootEl.setAttribute("data-theme", currentTheme);
-        themeToggleBtn.textContent = currentTheme === "dark" ? "🌙" : "☀️";
-        themeToggleBtn.title =
-          currentTheme === "dark"
-            ? t("theme_tooltip_dark")
-            : t("theme_tooltip_light");
-      }
-
-      startBtn.addEventListener("click", () => {
-        if (timerId) return;
-
-        const w = parseInt(workInput.value, 10);
-        const r = parseInt(restInput.value, 10);
-        const n = parseInt(setsInput.value, 10);
-
-        if (!Number.isFinite(w) || w <= 0) {
-          alert(currentLang === "zh"
-            ? "請輸入大於 0 的運動秒數"
-            : "Please enter a work duration greater than 0 seconds");
-          return;
-        }
-        if (!Number.isFinite(r) || r < 0) {
-          alert(currentLang === "zh"
-            ? "休息秒數不可為負數"
-            : "Rest duration cannot be negative");
-          return;
-        }
-        if (!Number.isFinite(n) || n <= 0) {
-          alert(currentLang === "zh"
-            ? "請輸入大於 0 的組數"
-            : "Please enter a number of sets greater than 0");
-          return;
-        }
-
-        globalWorkSec = w;
-        globalRestSec = r;
-        globalSets = n;
-
-        phase = "work";
-        currentSet = 1;
-        remainingSec = globalWorkSec;
-        phaseTotalSec = globalWorkSec;
-        timerPhaseEl.textContent = t("phase_work");
-        timerPhaseEl.className = "timer-phase phase-work";
-        timerSetEl.textContent = t("sets_info", {
-          current: currentSet,
-          total: globalSets,
-        });
-        statusLabelEl.textContent = t("status_work", {
-          set: currentSet,
-        });
-        timerValueEl.textContent = formatTime(remainingSec);
-        setProgress(1);
-
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-
-        if (timerId) clearInterval(timerId);
-        timerId = setInterval(tick, 1000);
-      });
-
-      stopBtn.addEventListener("click", () => {
-        resetState();
-      });
-
-      langSelectEl.addEventListener("change", () => {
-        currentLang = langSelectEl.value;
-        localStorage.setItem("lang", currentLang);
-        applyTranslations();
-        resetState(); // 切換語言時順便重置狀態
-      });
-
-      themeToggleBtn.addEventListener("click", () => {
-        currentTheme = currentTheme === "dark" ? "light" : "dark";
-        localStorage.setItem("theme", currentTheme);
-        applyTheme();
-      });
-
-      // 初始化
-      applyTheme();
-      applyTranslations();
-      updateTotalLabel();
-      resetState();
-    </script>
+    <script src="assets/js/app.js" defer></script>
   </body>
 </html>
